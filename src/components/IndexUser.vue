@@ -4,7 +4,7 @@
     <div class="userTop">
       <img src="static/img/logo.png" alt="" class="userImg">
       <div class="userName">
-        <span>{{username}}</span>
+        <span>{{producer.name}}</span>
       </div>
     </div>
     <yd-cell-group>
@@ -33,12 +33,13 @@ export default {
   data () {
     return {
       title:"用户中心",
-      username:"用户昵称",
       ydswitch: true
     }
   },
   computed:{
-
+    producer(){
+      return this.$store.state.producer;
+    }
   },
   watch:{
     ydswitch(){
