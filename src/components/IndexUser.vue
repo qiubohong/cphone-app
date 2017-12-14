@@ -38,10 +38,23 @@ export default {
     }
   },
   computed:{
+
+  },
+  watch:{
+    ydswitch(){
+      this.setStatus();
+    }
   },
   methods:{
+    setStatus(){
+      this.$dialog.loading.open();
+      this.$store.dispatch('FETCH_UPLOAD', { serviceStatus: ~~this.ydswitch }).then(()=>{
+        this.$dialog.loading.close();
+      });
+    },
     logout(){
-      localStorage.removeItem('login');
+      sessionStorage.clear();
+      this.$store.dispatch('FETCH_LOGIN_CACHE')
       this.$router.replace({name:'login'})
     }
   }
