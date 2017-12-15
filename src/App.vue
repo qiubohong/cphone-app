@@ -13,15 +13,6 @@ export default {
       this.$router.replace({name:'login'});
     }
 
-    navigator.geolocation.getCurrentPosition((position) =>{
-      console.log("position:"+position.coords.longitude)
-        let longitude = position.coords.longitude;
-        let latitude = position.coords.latitude;
-        sessionStorage.setItem(this.$store.state.key.position.longitude, longitude);
-        sessionStorage.setItem(this.$store.state.key.position.latitude, latitude);
-        this.$store.dispatch('FETCH_POSITION');
-    });
-
   },
 }
 </script>

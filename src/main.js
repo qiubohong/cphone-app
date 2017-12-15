@@ -13,7 +13,25 @@ Vue.use(YDUI);
 
 Vue.config.productionTip = false
 
+let flag = false;
+
 Vue.mixin({
+  beforeCreate(){
+    if(flag) return;
+    flag = true;
+    navigator.geolocation.getCurrentPosition((position) =>{
+        console.log("position:"+position.coords.longitude)
+        let longitude = position.coords.longitude;
+        let latitude = position.coords.latitude;
+        sessionStorage.setItem(this.$store.state.key.position.longitude, longitude);
+        sessionStorage.setItem(this.$store.state.key.position.latitude, latitude);
+        this.$store.dispatch('FETCH_POSITION');
+        setTimeout(function() {
+          flag = false;
+        }, 1000);
+    });
+
+  },
   methods: {
     toastError(mes) {
       this.$dialog.toast({
