@@ -1,111 +1,113 @@
 <template>
   <yd-layout>
     <yd-navbar slot="navbar" title="订单详情">
-            <router-link to="index/refresh" slot="left">
+            <router-link to="/index/refresh" slot="left">
                 <yd-navbar-back-icon></yd-navbar-back-icon>
             </router-link>
     </yd-navbar>
     <yd-cell-group>
         <yd-cell-item>
-            <span slot="left">订单号：{{phoneOrder.id}}</span>
+            <span slot="left">订单号：{{phoneOrder.serialNumber}}</span>
         </yd-cell-item>
         <yd-cell-item>
-            <span slot="left">手机型号：{{phoneOrder.phoneType}}</span>
+            <span slot="left">手机型号：{{phoneOrder.recyclePhoneId}}</span>
         </yd-cell-item>
         <yd-cell-item>
-            <span slot="left">回收价格：￥{{phoneOrder.offerPrice}}</span>
+            <span slot="left">回收价格：￥{{phoneOrder.amount}}</span>
         </yd-cell-item>
     </yd-cell-group>
     <yd-cell-group title="手机信息">
-        <yd-cell-item type="checkbox" v-for="item in phoneOrder.problems">
-            <span slot="left">{{item.problemName}}：{{item.select}}</span>
-            <input slot="right" type="checkbox" :value="item.select" v-model="checkedNames" v-if="phoneOrder.status == 2"/>
-            <yd-icon name="shield-outline" slot="right" v-if="phoneOrder.status > 2 && checkedNames.indexOf(item.select)>=0"></yd-icon>
-            <yd-icon name="error-outline" slot="right" v-if="phoneOrder.status > 2 && checkedNames.indexOf(item.select)<0"></yd-icon>
+        <yd-cell-item type="checkbox" v-for="item in phoneOrder.problemSelects">
+            <span slot="left">{{item.problemItem}}</span>
+            <template v-if="item.problemItem = '1'">
+              <input slot="right" type="checkbox" :value="item.select" v-model="checkedNames"/>
+              <yd-icon name="shield-outline" slot="right"></yd-icon>
+              <yd-icon name="error-outline" slot="right"></yd-icon>
+            </template>
         </yd-cell-item>
      </yd-cell-group>
     <yd-cell-group title="用户信息">
         <yd-cell-item>
-            <span slot="left">用户姓名：{{phoneOrder.userInfo.userName}}</span>
+            <span slot="left">用户姓名：{{customer.name}}</span>
         </yd-cell-item>
         <yd-cell-item>
-            <span slot="left">服务类型：{{phoneOrder.userInfo.serviceType}}</span>
+            <span slot="left">服务类型：{{serviceType[phoneOrder.serviceType]}}</span>
         </yd-cell-item>
-        <yd-cell-item arrow type="a" :href="'tel:'+phoneOrder.userInfo.tel">
-            <span slot="left">电话：{{phoneOrder.userInfo.tel}}</span>
+        <yd-cell-item arrow type="a" :href="'tel:'+customer.number">
+            <span slot="left">电话：{{customer.number}}</span>
         </yd-cell-item>
         <template v-if="phoneOrder.serviceType === 3">
-          <yd-cell-item arrow >
-              <span slot="left">快递单号：{{phoneOrder.userInfo.courierId}}</span>
+          <yd-cell-item >
+              <span slot="left">快递单号：{{phoneOrder.expressNumber}}</span>
               <span slot="right">{{phoneOrder.userInfo.expressCompany}}</span>
           </yd-cell-item>
         </template>
         <template v-if="phoneOrder.serviceType === 2">
-          <yd-cell-item arrow>
-              <span slot="left">预约时间：{{phoneOrder.userInfo.serviceTime}}</span>
+          <yd-cell-item>
+              <span slot="left">预约时间：{{phoneOrder.period}}</span>
           </yd-cell-item>
         </template>
         <template v-if="phoneOrder.serviceType === 1">
-          <yd-cell-item arrow>
-            <span slot="left">上门地址：{{phoneOrder.userInfo.serviceAddr}}</span>
+          <yd-cell-item >
+            <span slot="left">上门地址：{{phoneOrder.address}}</span>
           </yd-cell-item>
-          <yd-cell-item arrow>
-              <span slot="left">预约时间：{{phoneOrder.userInfo.serviceTime}}</span>
+          <yd-cell-item >
+              <span slot="left">预约时间：{{phoneOrder.period}}</span>
           </yd-cell-item>
         </template>
     </yd-cell-group>
     <yd-cell-group title="备注">
         <yd-cell-item>
-          <yd-textarea slot="right" placeholder="请输入您与客户沟通的备注信息" maxlength="200"></yd-textarea>
+          <yd-textarea v-model="phoneOrder.remark" slot="right" placeholder="请输入您与客户沟通的备注信息" maxlength="200"></yd-textarea>
         </yd-cell-item>
      </yd-cell-group>
-     <yd-button size="large" type="primary" slot="bottom" @click.native="goNext">
-       <span v-if="phoneOrder.status == 1">马上出发</span>
-       <span v-if="phoneOrder.status == 2">确认回收</span>
-       <span v-if="phoneOrder.status == 3">等待用户确认</span>
-       <span v-if="phoneOrder.status == 4">已完成</span>
+     <yd-button size="large" type="primary" slot="bottom" @click.native="goNext" v-if="phoneOrder.status == 2">
+       <span>确认回收</span>
      </yd-button>
+     <yd-button size="large" slot="bottom" v-if="phoneOrder.status == 3">
+       <span>等待用户确认</span>
+     </yd-button>
+     <div class="order-cancle" v-if="phoneOrder.status == 4" >
+       <div class="order-cancle-txt" style="color:rgb(0, 134, 14)">订单已完成</div>
+     </div>
+     <div class="order-cancle" v-if="phoneOrder.status == 5" >
+       <div class="order-cancle-txt">订单已取消</div>
+     </div>
   </yd-layout>
 </template>
 <script>
 export default {
   name: 'RefreshOrder',
+  created(){
+    this.$dialog.loading.open();
+    let {dispatch} = this.$store;
+    dispatch('FETCH_RECYCLE_ORDER_ID',{serialNumber:this.$route.params.id})
+      .then((data)=>{
+        this.$dialog.loading.close();
+        if(data.data && data.errorCode === this.$store.state.code['success']){
+           dispatch('FETCH_COSTOMER',{customerId:data.data.customerId})
+            .then((data)=>{
+              this.customer = data.data;
+            });
+        }else{
+          toastError(data.errorInfo);
+        }
+      }).catch(()=>toastError('网络异常，请稍后重试！'))
+  },
   data () {
     return {
       checkedNames: [],
+      customer:{},
+      serviceType: {
+        "1": "上门",
+        "2": "门店",
+        "3": "邮寄"
+      }
     }
   },
   computed: {
     phoneOrder(){
-      return {
-        id:"12123213213123",
-        phoneType:"iphone 6s",
-        price:2800,
-        offerPrice: 400,
-        problems:[{
-          problemName: "容量",
-          select: "16G",
-          discount: 0.02
-        },{
-          problemName: "屏幕外观",
-          select: "明显划痕",
-          discount: 0.02
-        },{
-          problemName: "维修记录",
-          select: "拆修过",
-          discount: 0.12
-        }],
-        status: 1,//0 未填写完成， 1 用户下单 ，2服务方确认，3服务方完成，4 用户确认完成 ，5 取消 
-        serviceType: 1,  //服务类型：1请求上门 2 门店地址 3邮寄地址
-        userInfo:{
-          userName:"用户昵称",
-          expressCompany: "快递公司名称", //快递公司名称
-          courierId: "xxxxxxxxx ",  //快递单号
-          tel:"123123123123",
-          serviceAddr: "广东省xxxxxxx",
-          serviceTime: "2014-22-11 10:10:11"
-        }
-      };
+      return this.$store.state.recycle;
     }
   },
   methods:{

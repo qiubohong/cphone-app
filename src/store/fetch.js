@@ -49,7 +49,31 @@ export function login(number, password){
 export function upload(number, lat, lng, serviceStatus){ //上门服务状态：0停止服务，1正常服务
     return fetch({ url: BASE + `user/producer/upload` ,data:{number, lat, lng, serviceStatus}})
 }
+export function getCustomer(customerId){
+    return fetch({ url: BASE + `user/customerInfo/${customerId}`})
+}
+export function getStoreByProducerId(producerId){
+    return fetch({ url: BASE + `storeinfo/getByProducerId/${producerId}`})
+}
+export function updateByProducerId(data){
+    return fetch({ url: BASE + `/storeinfo/updateByProducerId`, data, method:"post"});
+}
 
-export function getWaitingOrder(producerId){
-    return fetch({ url: BASE + `admin/recycle/order/queryList?pageSize=100&startIndex=0`,data:{producerId}})
+
+
+//回收
+export function getWaitingOrder(number){
+  return fetch({ url: BASE + `/recycle/order/getWaitingOrder/${number}`,data:{number}})
+}
+
+export function recycleOrderById(serialNumber){
+  return fetch({ url: BASE + `recycle/order/orderInfo/${serialNumber}`})
+}
+
+//维修
+export function getRepairOrder(number){
+  return fetch({ url: BASE + `maintain/order/getWaitingOrder/${number}`,data:{number}})
+}
+export function repairOrderById(serialNumber){
+  return fetch({ url: BASE + `maintain/order/orderInfo/${serialNumber}`})
 }

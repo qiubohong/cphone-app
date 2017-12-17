@@ -12,6 +12,7 @@ import IndexUser from '@/components/IndexUser'
 import RefreshOrder from '@/components/RefreshOrder'
 import RepairOrder from '@/components/RepairOrder'
 import Shop from '@/components/Shop'
+import Map from '@/components/Map'
 
 
 Vue.use(Router)
@@ -44,16 +45,20 @@ export default new Router({
       component: IndexUser
     }]
   },{
-    path: '/refreshOrder',
+    path: '/refreshOrder/:id',
     name: 'refreshOrder',
     component: RefreshOrder,
   },{
-    path: '/repairOrder',
+    path: '/repairOrder/:id',
     name: 'repairOrder',
     component: RepairOrder,
   },{
     path: '/shop',
     name: 'shop',
     component: Shop,
+  },{
+    path: '/map',
+    name: 'map',
+    component: Map,
   }]
 })

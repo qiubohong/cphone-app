@@ -63,4 +63,23 @@ export default {
 .fade-enter, .fade-leave-to /* .fade-leave-active in below version 2.1.8 */ {
   opacity: 0
 }
+.order-cancle{
+    position: fixed;
+    width: 100%;
+    height:100%;
+    top:1rem;
+    z-index: 999;
+    text-align: center;
+}
+.order-cancle-txt{
+	color: #f00;
+    top: 40%;
+    width: 100%;
+    position: fixed;
+    font-size: .6rem;
+    opacity: 0.6;
+    transform: rotate(-32deg);
+
+
+}
 </style>

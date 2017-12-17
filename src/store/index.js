@@ -14,6 +14,10 @@ export default new Vuex.Store({
       latitude: 22,
     },
     recycleList:[],
+    recycle:{},
+
+    repairList:[],
+    repair:{},
 
 
     timeId: -1,
@@ -56,7 +60,7 @@ export default new Vuex.Store({
       } else if (state.timeId == -1 && serviceStatus == 1) {
         state.timeId = window.setInterval(() => {
           dispatch('FETCH_UPLOAD', { serviceStatus: 1 })
-        }, 6000 * 3);
+        }, 1000 * 60 * 5);
       }
       return new Promise((resolve, reject) => {
         fetch.upload(state.producer.number, state.position.latitude, state.position.longitude, serviceStatus)
@@ -65,13 +69,66 @@ export default new Vuex.Store({
           }).catch(reject);
       })
     },
-
+    FETCH_COSTOMER: ({ commit, dispatch, state }, {customerId}) => {
+      return new Promise((resolve, reject) => {
+        fetch.getCustomer(customerId)
+          .then((data) => {
+            resolve(data);
+          }).catch(reject);
+      })
+    },
+    FETCH_STORE:({ commit, dispatch, state }) => {
+      return new Promise((resolve, reject) => {
+        fetch.getStoreByProducerId(state.producer.id)
+          .then((data) => {
+            resolve(data);
+          }).catch(reject);
+      })
+    },
+    FETCH_STORE_UPDATE:({ commit, dispatch, state },{data}) => {
+      return new Promise((resolve, reject) => {
+        fetch.updateByProducerId(data)
+          .then((data) => {
+            resolve(data);
+          }).catch(reject);
+      })
+    },
+    //回收
     FETCH_RECYCLE_ORDER: ({ commit, dispatch, state }) => {
       return new Promise((resolve, reject) => {
-        fetch.getWaitingOrder(state.producer.id)
+        fetch.getWaitingOrder(state.producer.number)
           .then((data) => {
             resolve(data);
             commit('SET_RECYCLE_ORDER', { data })
+          }).catch(reject);
+      })
+    },
+    FETCH_RECYCLE_ORDER_ID: ({ commit, dispatch, state },{serialNumber}) => {
+      console.log('FETCH_RECYCLE_ORDER_ID')
+      return new Promise((resolve, reject) => {
+        fetch.recycleOrderById(serialNumber)
+          .then((data) => {
+            resolve(data);
+            commit('SET_RECYCLE', { data })
+          }).catch(reject);
+      })
+    },
+    //维修
+    FETCH_REPAIR_ORDER: ({ commit, dispatch, state }) => {
+      return new Promise((resolve, reject) => {
+        fetch.getRepairOrder(state.producer.number)
+          .then((data) => {
+            resolve(data);
+            commit('SET_REPAIR_ORDER', { data })
+          }).catch(reject);
+      })
+    },
+    FETCH_REPAIR_ORDER_ID: ({ commit, dispatch, state },{serialNumber}) => {
+      return new Promise((resolve, reject) => {
+        fetch.repairOrderById(serialNumber)
+          .then((data) => {
+            resolve(data);
+            commit('SET_REPAIR', { data })
           }).catch(reject);
       })
     },
@@ -95,6 +152,27 @@ export default new Vuex.Store({
         state.recycleList = [...data.data];
       } else {
         state.recycleList =[];
+      }
+    },
+    SET_RECYCLE: (state, { data }) => {
+      if (data.errorCode == SUCCESS) {
+        state.recycle = data.data;
+      } else {
+        state.recycle ={};
+      }
+    },
+    SET_REPAIR_ORDER: (state, { data }) => {
+      if (data.errorCode == SUCCESS) {
+        state.repairList = [...data.data];
+      } else {
+        state.repairList =[];
+      }
+    },
+    SET_REPAIR: (state, { data }) => {
+      if (data.errorCode == SUCCESS) {
+        state.repair = data.data;
+      } else {
+        state.repair ={};
       }
     },
     SET_POSITION: (state, { longitude, latitude }) => {

@@ -13,7 +13,7 @@
     </div>
     <yd-pullrefresh :callback="loadList" ref="pullrefreshDemo" v-if="recycles.length > 0">
             <yd-cell-group>
-                <yd-cell-item arrow type="link" href="/refreshOrder" v-for="item in recycles">
+                <yd-cell-item arrow type="link" :href="'/refreshOrder/'+item.serialNumber" v-for="item in recycles">
                     <yd-icon slot="icon" name="warn" v-if="item.serviceType == 1"></yd-icon>
                     <yd-icon slot="icon" name="footmark" v-if="item.serviceType == 2"></yd-icon>
                     <yd-icon slot="icon" name="checkoff" color="#57b83b" v-if="item.serviceType == 3"></yd-icon>
@@ -52,7 +52,7 @@ export default {
   },
   watch:{
     selectKey(){
-      this.fiterOrder();
+      //this.fiterOrder();
     }
   },
   methods: {
