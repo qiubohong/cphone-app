@@ -104,7 +104,6 @@ export default new Vuex.Store({
       })
     },
     FETCH_RECYCLE_ORDER_ID: ({ commit, dispatch, state },{serialNumber}) => {
-      console.log('FETCH_RECYCLE_ORDER_ID')
       return new Promise((resolve, reject) => {
         fetch.recycleOrderById(serialNumber)
           .then((data) => {
