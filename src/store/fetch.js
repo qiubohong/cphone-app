@@ -59,21 +59,46 @@ export function updateByProducerId(data){
     return fetch({ url: BASE + `/storeinfo/updateByProducerId`, data, method:"post"});
 }
 
-
+export function getStoreInfo(storeId){
+    return fetch({ url: BASE + `storeinfo/storeInfo/${storeId}`})
+}
 
 //回收
 export function getWaitingOrder(number){
-  return fetch({ url: BASE + `/recycle/order/getWaitingOrder/${number}`,data:{number}})
+  return fetch({ url: BASE + `recycle/order/orderListByProducer`,data:{number}})
 }
 
 export function recycleOrderById(serialNumber){
   return fetch({ url: BASE + `recycle/order/orderInfo/${serialNumber}`})
 }
 
+export function recyclePhoneInfo(recyclePhoneId){
+  return fetch({ url: BASE + `recycle/recyclePhoneInfo/${recyclePhoneId}`})
+}
+
+export function updateOrder(data){
+  return fetch({ url: BASE + `recycle/order/updateOrder`, data, method:'post'})
+}
+
+export function finishOrder(serialNumber){
+  return fetch({ url: BASE + `recycle/order/finishOrder/${serialNumber}`})
+}
+
 //维修
 export function getRepairOrder(number){
-  return fetch({ url: BASE + `maintain/order/getWaitingOrder/${number}`,data:{number}})
+  return fetch({ url: BASE + `maintain/order/orderListByProducer`,data:{number}})
 }
 export function repairOrderById(serialNumber){
   return fetch({ url: BASE + `maintain/order/orderInfo/${serialNumber}`})
+}
+export function repairPhoneInfo(maintainPhoneId){
+  return fetch({ url: BASE + `maintain/maintainPhoneInfo/${maintainPhoneId}`})
+}
+
+export function updateRepairOrder(data){
+  return fetch({ url: BASE + `maintain/order/updateOrder`, data, method:'post'})
+}
+
+export function finishRepairOrder(serialNumber){
+  return fetch({ url: BASE + `maintain/order/finishOrder/${serialNumber}`})
 }

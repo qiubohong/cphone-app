@@ -31,16 +31,16 @@ export default {
 .order-status{
 	font-size: .28rem;
 	margin-bottom: .2rem;
-	color:#999;
+	color:rgb(255, 94, 83);
 }
 .order-status.ok{
 	color:#57b83b;
 }
 .order-status.money{
-	color:#e2d92a;
+	color:#968f04;
 }
 .order-status.error{
-  color:#f00;
+  color:#999;
 }
 .order-img{
 	width: .6rem !important;
@@ -63,23 +63,11 @@ export default {
 .fade-enter, .fade-leave-to /* .fade-leave-active in below version 2.1.8 */ {
   opacity: 0
 }
-.order-cancle{
-    position: fixed;
-    width: 100%;
-    height:100%;
-    top:1rem;
-    z-index: 999;
-    text-align: center;
-}
-.order-cancle-txt{
-	color: #f00;
-    top: 40%;
-    width: 100%;
-    position: fixed;
-    font-size: .6rem;
-    opacity: 0.6;
-    transform: rotate(-32deg);
-
-
+.order-result{
+  padding:.5rem;
+  text-align: center;
+  background: #fff;
+  margin-bottom: .2rem;
+  font-size: .5rem;
 }
 </style>

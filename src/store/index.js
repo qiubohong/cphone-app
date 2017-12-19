@@ -13,12 +13,15 @@ export default new Vuex.Store({
       longitude: 113,
       latitude: 22,
     },
+    userDot: false,
+
+    recycleDot: true,
     recycleList:[],
     recycle:{},
 
     repairList:[],
     repair:{},
-
+    repairDot: true,
 
     timeId: -1,
     key: {
@@ -66,6 +69,18 @@ export default new Vuex.Store({
         fetch.upload(state.producer.number, state.position.latitude, state.position.longitude, serviceStatus)
           .then((data) => {
             resolve(data);
+            if(data && data.errorCode == SUCCESS ){
+              let array = data.data;
+              if(array && array.length > 1){
+                array.forEach((item)=>{
+                  if(item.orderType == '2'){
+                    commit('SET_RECYCLE_DOT',{flag:true})
+                  }else if(item.orderType == '1'){
+                    commit('SET_REPAIR_DOT',{flag:true})
+                  }
+                })
+              }
+            }
           }).catch(reject);
       })
     },
@@ -100,6 +115,7 @@ export default new Vuex.Store({
           .then((data) => {
             resolve(data);
             commit('SET_RECYCLE_ORDER', { data })
+            commit('SET_RECYCLE_DOT',{flag:false})
           }).catch(reject);
       })
     },
@@ -119,6 +135,7 @@ export default new Vuex.Store({
           .then((data) => {
             resolve(data);
             commit('SET_REPAIR_ORDER', { data })
+            commit('SET_REPAIR_DOT', { flag:false })
           }).catch(reject);
       })
     },
@@ -131,7 +148,6 @@ export default new Vuex.Store({
           }).catch(reject);
       })
     },
-
     FETCH_POSITION: ({ commit, dispatch, state }) => {
       let longitude = localStorage.getItem(state.key.position.longitude);
       let latitude = localStorage.getItem(state.key.position.latitude);
@@ -181,6 +197,15 @@ export default new Vuex.Store({
       }
       state.position.longitude = longitude;
       state.position.latitude = latitude;
+    },
+    SET_RECYCLE_DOT: (state, { flag }) => {
+      state.recycleDot = flag;
+    },
+    SET_REPAIR_DOT: (state, { flag }) => {
+      state.repairDot = flag;
+    },
+    SET_USER_DOT: (state, { flag }) => {
+      state.userDot = flag;
     },
   }
 });

@@ -1,121 +1,284 @@
 <template>
   <yd-layout>
     <yd-navbar slot="navbar" title="订单详情">
-            <router-link to="index/repair" slot="left">
-                <yd-navbar-back-icon></yd-navbar-back-icon>
-            </router-link>
+      <yd-navbar-back-icon slot="left" @click.native="goBack"></yd-navbar-back-icon>
     </yd-navbar>
+    <div class="order-result" v-if="phoneOrder.status == 4"  style="color:rgb(17, 195, 36)">
+      <yd-icon name="checkoff" color="rgb(17, 195, 36)"></yd-icon>订单已完成
+    </div>
+    <div class="order-result" v-if="phoneOrder.status == 5"  style="color:#f00">
+      <yd-icon name="error" color="#f00"></yd-icon>订单已取消
+    </div>
     <yd-cell-group>
-        <yd-cell-item>
-            <span slot="left">订单号：{{phoneOrder.id}}</span>
-        </yd-cell-item>
-        <yd-cell-item>
-            <span slot="left">手机型号：{{phoneOrder.phoneType}}</span>
-        </yd-cell-item>
-        <yd-cell-item>
-            <span slot="left">维修价格：￥{{phoneOrder.offerPrice}}</span>
-        </yd-cell-item>
+      <yd-cell-item>
+        <span slot="left">订单号：{{phoneOrder.serialNumber}}</span>
+      </yd-cell-item>
+      <yd-cell-item>
+        <span slot="left">支付状态：{{phoneOrder.payStatus == 0 ? "未支付" : "已支付"}}</span>
+      </yd-cell-item>
+      <yd-cell-item>
+        <span slot="left">手机型号：{{phone.name}}</span>
+      </yd-cell-item>
+      <yd-cell-item>
+        <span slot="left">维修价格：￥{{phoneOrder.amount}}</span>
+      </yd-cell-item>
     </yd-cell-group>
-    <yd-cell-group title="故障类型">
-        <yd-cell-item type="checkbox" v-for="item in phoneOrder.problems">
-            <span slot="left">{{item.type}}{{item.select}}</span>
-            <input slot="right" type="checkbox" :value="item.select" v-model="checkedNames" v-if="phoneOrder.status == 2"/>
-            <yd-icon name="shield-outline" slot="right" v-if="phoneOrder.status > 2 && checkedNames.indexOf(item.select)>=0"></yd-icon>
-            <yd-icon name="error-outline" slot="right" v-if="phoneOrder.status > 2 && checkedNames.indexOf(item.select)<0"></yd-icon>
-        </yd-cell-item>
-     </yd-cell-group>
-    <yd-cell-group title="用户信息">
-        <yd-cell-item>
-            <span slot="left">用户姓名：{{phoneOrder.userInfo.userName}}</span>
-        </yd-cell-item>
-        <yd-cell-item>
-            <span slot="left">服务类型：{{phoneOrder.userInfo.serviceType}}</span>
-        </yd-cell-item>
-        <yd-cell-item arrow type="a" :href="'tel:'+phoneOrder.userInfo.tel">
-            <span slot="left">电话：{{phoneOrder.userInfo.tel}}</span>
-        </yd-cell-item>
-        <template v-if="phoneOrder.serviceType === 3">
-          <yd-cell-item arrow >
-              <span slot="left">快递单号：{{phoneOrder.userInfo.courierId}}</span>
+    <!-- 问题处理阶段 statu=1 -->
+    <template v-if="phoneOrder.status == 1">
+      <div style="color: #888;font-size:.3rem;padding:0 .2rem .1rem;">维修故障</div>
+      <yd-accordion>
+        <yd-accordion-item :title="(index+1)+'. '+item.problemName" v-for="(item,index) in problems">
+          <yd-cell-group>
+            <yd-cell-item :type="item.problemType == 0 ? 'radio' : 'checkbox'" v-for="item2 in item.selects">
+              <span slot="left">{{item2.problemItem}}</span>
+              <input slot="right" :type="item.problemType == 0 ? 'radio' : 'checkbox'" :value="item2.id" v-model="item.checked" />
+            </yd-cell-item>
+          </yd-cell-group>
+        </yd-accordion-item>
+      </yd-accordion>
+    </template>
+    <!-- 不可修改问题阶段 status> 1 -->
+    <template v-if="phoneOrder.status > 1">
+      <yd-accordion style="margin-top:.2rem">
+        <yd-accordion-item title="维修故障" open>
+          <yd-cell-group>
+            <yd-cell-item v-for="(item,index) in problems">
+              <span slot="left">{{(index+1)+'. '}}{{item.problemName}}
+              <template v-if="item2.problemId == item.id" v-for="item2 in phoneOrder.problemSelects">
+                <yd-badge type="hollow">{{item2.problemItem}}</yd-badge>
+              </template>
+            </span>
+            </yd-cell-item>
+          </yd-cell-group>
+        </yd-accordion-item>
+      </yd-accordion>
+    </template>
+
+    <yd-accordion style="margin-top:.2rem">
+      <yd-accordion-item title="用户信息" open>
+        <yd-cell-group>
+          <yd-cell-item>
+            <span slot="left">用户姓名：{{customer.name}}</span>
+          </yd-cell-item>
+          <yd-cell-item>
+            <span slot="left">服务类型：{{serviceType[phoneOrder.serviceType]}}</span>
+          </yd-cell-item>
+          <yd-cell-item arrow type="a" :href="'tel:'+customer.number">
+            <span slot="left">电话：{{customer.number}}</span>
+          </yd-cell-item>
+          <template v-if="phoneOrder.serviceType === 3">
+            <yd-cell-item>
+              <span slot="left">快递单号：{{phoneOrder.expressNumber}}</span>
               <span slot="right">{{phoneOrder.userInfo.expressCompany}}</span>
-          </yd-cell-item>
-        </template>
-        <template v-if="phoneOrder.serviceType === 2">
-          <yd-cell-item arrow>
-              <span slot="left">预约时间：{{phoneOrder.userInfo.serviceTime}}</span>
-          </yd-cell-item>
-        </template>
-        <template v-if="phoneOrder.serviceType === 1">
-          <yd-cell-item arrow>
-            <span slot="left">上门地址：{{phoneOrder.userInfo.serviceAddr}}</span>
-          </yd-cell-item>
-          <yd-cell-item arrow>
-              <span slot="left">预约时间：{{phoneOrder.userInfo.serviceTime}}</span>
-          </yd-cell-item>
-        </template>
+            </yd-cell-item>
+          </template>
+          <template v-if="phoneOrder.serviceType === 2">
+            <yd-cell-item>
+              <span slot="left">预约门店：{{store.name}}</span>
+            </yd-cell-item>
+            <yd-cell-item>
+              <span slot="left">门店地址：{{store.address}}</span>
+            </yd-cell-item>
+          </template>
+          <template v-if="phoneOrder.serviceType === 1">
+            <yd-cell-item>
+              <span slot="left">上门地址：{{phoneOrder.address}}</span>
+            </yd-cell-item>
+            <yd-cell-item>
+              <span slot="left">预约时间：{{phoneOrder.period}}</span>
+            </yd-cell-item>
+          </template>
+        </yd-cell-group>
+      </yd-accordion-item>
+    </yd-accordion>
+    <yd-cell-group title="备注" style="margin-top:.2rem">
+      <yd-cell-item>
+        <yd-textarea v-model="phoneOrder.remark" slot="right" placeholder="请输入您与客户沟通的备注信息" :readonly="phoneOrder.status >= 2" maxlength="200"></yd-textarea>
+      </yd-cell-item>
     </yd-cell-group>
-    <yd-cell-group title="备注">
-        <yd-cell-item>
-          <yd-textarea slot="right" placeholder="请输入您与客户沟通的备注信息" maxlength="200"></yd-textarea>
-        </yd-cell-item>
-     </yd-cell-group>
-     <yd-button size="large" type="primary" slot="bottom" @click.native="goNext">
-       <span v-if="phoneOrder.status == 1">马上出发</span>
-       <span v-if="phoneOrder.status == 2">确认回收</span>
-       <span v-if="phoneOrder.status == 3">等待用户确认</span>
-       <span v-if="phoneOrder.status == 4">已完成</span>
-     </yd-button>
+    <yd-button size="large" type="primary" slot="bottom" @click.native="goNext" v-if="phoneOrder.status == 1">
+      <span>问题确认</span>
+    </yd-button>
+    <yd-button size="large" type="primary" slot="bottom" @click.native="goNext" v-if="phoneOrder.status == 2">
+      <span>完成服务</span>
+    </yd-button>
+    <yd-button size="large" type="primary" slot="bottom" @click.native="wait" v-if="phoneOrder.status == 3">
+      <span>等待用户确认</span>
+    </yd-button>
+    <div class="order-cancle" v-if="phoneOrder.status == 5">
+      <div class="order-cancle-txt">订单已取消</div>
+    </div>
   </yd-layout>
 </template>
 <script>
+import { repairPhoneInfo, updateRepairOrder, finishRepairOrder, getStoreInfo } from '../store/fetch';
+
 export default {
   name: 'RefreshOrder',
-  data () {
+  created() {
+    this.initOrder();
+  },
+  data() {
     return {
-      checkedNames: [],
+      customer: {},
+      phone: {},
+      store: {},
+      problems: [],
+      serviceType: {
+        "1": "上门",
+        "2": "门店",
+        "3": "邮寄"
+      },
+      phoneOrder: {}
     }
   },
-  computed: {
-    phoneOrder(){
-      return {
-        id:"12123213213123",
-        phoneType:"iphone 6s",
-        price:2800,
-        offerPrice: 400,
-        problems:[{
-          type: "屏幕破碎",
-          select: "(不可操作)"
-        },{
-          type: "更换主板",
-          select: "",
-        },{
-          type: "更换电池",
-          select: "",
-        }],
-        status: 1,//0 未填写完成， 1 用户下单 ，2服务方确认，3服务方完成，4 用户确认完成 ，5 取消 
-        serviceType: 1,  //服务类型：1请求上门 2 门店地址 3邮寄地址
-        userInfo:{
-          userName:"用户昵称",
-          tel:"123123123123",
-          serviceAddr: "广东省xxxxxxx",
-          serviceTime: "2014-22-11 10:10:11"
-        }
-      };
-    }
-  },
-  methods:{
-    goNext(){
-      if(this.phoneOrder.status < 4){
-        this.$dialog.loading.open('请求中...');
-        setTimeout(()=> {
-            this.phoneOrder.status += 1;
-            this.$mount();
-            this.$dialog.loading.close();
-        }, 500);
+  methods: {
+    goNext() {
+      if (this.phoneOrder.status == 1) {
+        this.$dialog.confirm({
+          title: '创手机-提醒您',
+          mes: '确认与用户协商回收问题选项(后续不可修改)？',
+          opts: () => {
+            this.updateOrder();
+          }
+        })
+      } else if (this.phoneOrder.status == 2) {
+        this.$dialog.confirm({
+          title: '创手机-提醒您',
+          mes: '是否已完成维修？',
+          opts: () => {
+            this.finishOrder();
+          }
+        })
       }
+    },
+    wait() {
+      this.$dialog.alert({
+        mes: "等待用户确认,点击确认刷新",
+        callback: () => {
+          this.initOrder();
+        }
+      })
+    },
+    updateOrder() {
+      let temp = { ...this.phoneOrder };
+      temp.problemSelects = [];
+      this.problems.forEach((item) => {
+        item.selects.forEach((item2) => {
+          if (item.problemType == 0) {
+            if (item2.id == item.checked) {
+              temp.problemSelects.push(item2);
+            }
+          } else {
+            if (item.checked.indexOf(item2.id) >= 0) {
+              temp.problemSelects.push(item2);
+            }
+          }
+        })
+      });
+      if (temp.problemSelects.length < this.problems.length) {
+        this.toastError('有问题没选择！')
+        return;
+      }
+
+      delete temp.problems;
+      delete temp.status;
+
+      this.$dialog.loading.open('请求中...');
+      updateRepairOrder(temp).then((data) => {
+        this.$dialog.loading.close();
+        if (data.data && data.errorCode === this.$store.state.code['success']) {
+          this.$dialog.toast({
+            mes: "确认成功！",
+            icon: "success"
+          });
+          this.initOrder();
+        } else {
+          this.toastError(data.errorInfo);
+        }
+      }).catch((e) => {
+        console.log(e)
+        this.toastError('网络异常，请稍后重试！')
+      });
+    },
+    finishOrder(){
+      this.$dialog.loading.open('请求中...');
+        finishRepairOrder(this.phoneOrder.serialNumber).then((data) => {
+          this.$dialog.loading.close();
+          if (data.data && data.errorCode === this.$store.state.code['success']) {
+            this.$dialog.alert({
+              mes: "服务完成，等待用户确认！",
+              callback: () => {
+                this.initOrder();
+              }
+            });
+          } else {
+            this.toastError(data.errorInfo);
+          }
+        }).catch((e) => {
+          console.log(e)
+          this.toastError('网络异常，请稍后重试！')
+        });
+    },
+    initOrder() {
+      this.$dialog.loading.open();
+      let { dispatch } = this.$store;
+      dispatch('FETCH_REPAIR_ORDER_ID', { serialNumber: this.$route.params.id })
+        .then((data) => {
+          this.$dialog.loading.close();
+          if (data.data && data.errorCode === this.$store.state.code['success']) {
+            this.phoneOrder = data.data;
+            //用户信息
+            dispatch('FETCH_COSTOMER', { customerId: data.data.customerId })
+              .then((res) => {
+                this.customer = { ...res.data };
+              });
+            //手机信息
+            repairPhoneInfo(data.data.maintainPhoneId).then((res) => {
+              this.phone = { ...res.data };
+            })
+
+            //门店
+            if(this.phoneOrder.storeId){
+              getStoreInfo(this.phoneOrder.storeId).then((res) => {
+                this.store = { ...res.data };
+              })
+            }
+
+            //问题集合
+            let problems = [];
+            data.data.problems.forEach((item, index) => {
+              item.selects.forEach((item2) => {
+                data.data.problemSelects.forEach((item3) => {
+                  if (item3.problemId == item2.problemId) {
+                    if (item.problemType == 0) {
+                      item.checked = item3.id;
+                    } else {
+                      if (!item.checked) {
+                        item.checked = [item3.id];
+                      } else {
+                        item.checked.push(item3.id);
+                      }
+                    }
+                  }
+                });
+              })
+              problems.push({ ...item });
+            })
+            this.problems = [...problems];
+          } else {
+            this.toastError(data.errorInfo);
+          }
+        }).catch((e) => {
+          console.log(e)
+          this.toastError('网络异常，请稍后重试！')
+        })
     }
   }
 }
+
 </script>
 <style scoped>
+
+
 </style>

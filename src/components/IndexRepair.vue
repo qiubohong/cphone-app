@@ -2,131 +2,143 @@
   <div class="index-tabs">
     <yd-layout>
       <yd-tab :callback="tabsChange">
-          <yd-tab-panel label="全部" tabkey="0"></yd-tab-panel>
-          <yd-tab-panel label="已接单" tabkey="2"></yd-tab-panel>
-          <yd-tab-panel label="服务完成" tabkey="3"></yd-tab-panel>
-          <yd-tab-panel label="确认中" tabkey="4"></yd-tab-panel>
-          <yd-tab-panel label="已取消" tabkey="5"></yd-tab-panel>
+        <template v-for="(item,index) in tabs">
+          <yd-tab-panel v-if="index == 0" :label="item.name" :tabkey="item.status"></yd-tab-panel>
+          <yd-tab-panel v-if="index > 0 && index < 4" :label="item.name+'('+item.size+')'" :tabkey="item.status" :active="item.active"></yd-tab-panel>
+        </template>
       </yd-tab>
-    <div v-if="list.length == 0" style="text-align:center;padding:1rem 0;color:#ccc;font-size:.28rem;">
-      暂无数据
-    </div>
-    <yd-pullrefresh :callback="loadList" ref="pullrefreshDemo" v-if="list.length > 0">
+      <div v-if="list.length == 0" style="text-align:center;padding:1rem 0;color:#ccc;font-size:.28rem;">
+        暂无数据
+      </div>
+      <yd-pullrefresh :callback="loadList" ref="pullrefreshDemo" v-if="list.length > 0">
         <yd-cell-group>
-                <yd-cell-item arrow type="link" :href="'/repairOrder/'+item.serialNumber" v-for="item in recycles">
-                    <yd-icon slot="icon" name="warn" v-if="item.serviceType == 1"></yd-icon>
-                    <yd-icon slot="icon" name="footmark" v-if="item.serviceType == 2"></yd-icon>
-                    <yd-icon slot="icon" name="checkoff" color="#57b83b" v-if="item.serviceType == 3"></yd-icon>
-                    <img slot="icon" src="static/img/money.png" class="order-img"  v-if="item.serviceType == 4"/>
-                    <yd-icon slot="icon" name="error" color="#f00" v-if="item.serviceType == 5"></yd-icon>
-                    <span slot="left">
-                        <div class="order-box">
-                          <div class="order-title">iphone6</div>
-                          <div class="order-status" v-if="item.serviceType == 1">下单中</div>
-                          <div class="order-status" v-if="item.serviceType == 2">已接单</div>
-                          <div class="order-status ok" v-if="item.serviceType == 3">服务完成</div>
-                          <div class="order-status money" v-if="item.serviceType == 4">确认中</div>
-                          <div class="order-status error" v-if="item.serviceType == 5">取消</div>
-                        </div>
-                    </span>
-                    <span slot="right">￥{{item.amount}}</span>
-                </yd-cell-item>
-            </yd-cell-group>
-    </yd-pullrefresh>
+          <yd-cell-item arrow type="link" :href="'/repairOrder/'+item.serialNumber" v-for="item in list">
+            <yd-icon slot="icon" name="warn" v-if="item.status == 1"></yd-icon>
+            <yd-icon slot="icon" name="footmark" v-if="item.status == 2"></yd-icon>
+            <img slot="icon" src="static/img/money.png" class="order-img" v-if="item.status == 3" />
+            <yd-icon slot="icon" name="checkoff" color="#57b83b" v-if="item.status == 4"></yd-icon>
+            <yd-icon slot="icon" name="error" color="#f00" v-if="item.status == 5"></yd-icon>
+            <div slot="left">
+              <div class="order-box">
+                <div class="order-title">预约时间：{{item.period}}</div>
+                <div class="order-status" v-if="item.status == 1">待接单</div>
+                <div class="order-status" v-if="item.status == 2">已接单</div>
+                <div class="order-status money" v-if="item.status == 3">服务完成</div>
+                <div class="order-status ok" v-if="item.status == 4">已完成</div>
+                <div class="order-status error" v-if="item.status == 5">取消</div>
+              </div>
+            </div>
+            <span slot="right">维修：￥{{item.amount}}</span>
+          </yd-cell-item>
+        </yd-cell-group>
+      </yd-pullrefresh>
     </yd-layout>
   </div>
 </template>
 <script>
-function getData(size,type){
-  var m = Math.floor(Math.random()*size);
-      var list = [];
-      for(let i = 0;i<m;i++){
-        list.push({
-          id:i,
-          name: 'iphone'+i,
-          price: Math.floor(Math.random()*10000),
-          status: type || Math.floor(Math.random()*3)
-        })
-      }
+function getData(size, type) {
+  var m = Math.floor(Math.random() * size);
+  var list = [];
+  for (let i = 0; i < m; i++) {
+    list.push({
+      id: i,
+      name: 'iphone' + i,
+      price: Math.floor(Math.random() * 10000),
+      status: type || Math.floor(Math.random() * 3)
+    })
+  }
 
-      return list;
+  return list;
 }
 
 export default {
   name: 'IndexRepair',
-  created(){
+  created() {
     this.getRepairs();
   },
-  data () {
+  data() {
     return {
-      selectKey: 0,
+      selectKey: 1,
+      list: [],
+      tabs: [{
+        status: "0",
+        name: "全部",
+        size: 0
+      }, {
+        status: "1",
+        name: "待接单",
+        size: 0,
+        active:true,
+      }, {
+        status: "2",
+        name: "已接单",
+        size: 0
+      }, {
+        status: "3",
+        name: "服务完成",
+        size: 0
+      }, {
+        status: "4",
+        name: "确认",
+        size: 0
+      }, {
+        status: "5",
+        name: "取消",
+        size: 0
+      }]
     }
   },
-  computed:{
-    list(){
-      return this.$store.state.repairList;
+  computed: {},
+  watch: {
+    selectKey() {
+      this.getRecycle();
     }
   },
   methods: {
     loadList() {
-      this.getRepairs(()=>{
+      this.getRepairs(() => {
         this.$dialog.toast({
           mes: '刷新成功！'
         });
         this.$refs.pullrefreshDemo.$emit('ydui.pullrefresh.finishLoad');
       })
     },
-    tabsChange(label,tabkey){
+    tabsChange(label, tabkey) {
       this.selectKey = tabkey;
     },
-    getRepairs(callback){
+    getRepairs(callback) {
       callback || this.$dialog.loading.open();
-      this.$store.dispatch('FETCH_REPAIR_ORDER').then(()=>{
+      this.$store.dispatch('FETCH_REPAIR_ORDER').then(() => {
         callback || this.$dialog.loading.close();
-        callback && callback();
         this.fiterOrder();
+        callback && callback();
       });
     },
-    fiterOrder(){
-      //调试代码
-      this.$store.state.recycleList.forEach((item, index)=>{
-        if(index % 3 == 0){
-          item.serviceType = 3;
-        }
-        if(index % 4 == 0){
-          item.serviceType = 4;
-        }
-        if(index % 5 == 0){
-          item.serviceType = 5;
-        }
-      })
-      //end debug
-      
-      if(this.selectKey == 0){
-        this.recycles = this.$store.state.recycleList;
+    fiterOrder() {
+      this.tabs.forEach((item2) => {
+        item2.size = 0;
+        this.$store.state.repairList.forEach((item) => {
+          if (item.status == item2.status) {
+            item2.size++;
+          }
+        });
+      });
+      if (this.selectKey == 0) {
+        this.list = this.$store.state.repairList;
         return;
       }
-      this.recycles = [];
-      this.$store.state.recycleList.forEach((item, index)=>{
-        //debug
-        if(index % 3 == 0){
-          item.serviceType = 3;
-        }
-        if(index % 4 == 0){
-          item.serviceType = 4;
-        }
-        if(index % 5 == 0){
-          item.serviceType = 5;
-        }
-        //end debug
-        if(item.serviceType == this.selectKey){
-          this.recycles.push(item);
+      this.list = [];
+      this.$store.state.repairList.forEach((item, index) => {
+        if (item.status == this.selectKey) {
+          this.list.push(item);
         }
       })
-      console.log(this.recycles);
     }
   }
 }
+
 </script>
 <style scoped>
+
+
 </style>
