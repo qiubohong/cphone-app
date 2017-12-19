@@ -91,7 +91,7 @@ export default {
   computed: {},
   watch: {
     selectKey() {
-      this.getRecycle();
+      this.getRepairs();
     }
   },
   methods: {

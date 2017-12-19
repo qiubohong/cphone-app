@@ -30,6 +30,13 @@
 
 export default {
   name: 'login',
+  mounted(){
+    let number = localStorage.getItem('account');
+    console.log(number)
+    if(number){
+      this.number = number;
+    }
+  },
   computed: {
     
   },
@@ -54,6 +61,7 @@ export default {
             this.$dialog.loading.close();
             if (this.$store.state.code["success"] == data.errorCode) {
               sessionStorage.setItem(this.$store.state.key['login'],JSON.stringify(data));
+              localStorage.setItem('account', this.number);
               this.$store.dispatch('FETCH_LOGIN_CACHE')
               this.$router.replace({name:'index'});
             } else {
