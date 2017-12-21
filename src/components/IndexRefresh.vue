@@ -73,11 +73,29 @@ export default {
       }]
     }
   },
-  computed: {},
+  computed: {
+    recycleDot() {
+      return this.$store.state.recycleDot;
+    },
+  },
   watch: {
     selectKey() {
       this.getRecycle();
-    }
+    },
+    recycleDot(val) {
+      if (val) {
+        this.$dialog.confirm({
+          mes: "你有新的回收订单",
+          opts: [{
+            txt: '确定',
+            color: true,
+            callback: () => {
+              this.getRecycle();
+            }
+          }]
+        });
+      }
+    },
   },
   methods: {
     loadList() {

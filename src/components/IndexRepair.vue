@@ -36,21 +36,6 @@
   </div>
 </template>
 <script>
-function getData(size, type) {
-  var m = Math.floor(Math.random() * size);
-  var list = [];
-  for (let i = 0; i < m; i++) {
-    list.push({
-      id: i,
-      name: 'iphone' + i,
-      price: Math.floor(Math.random() * 10000),
-      status: type || Math.floor(Math.random() * 3)
-    })
-  }
-
-  return list;
-}
-
 export default {
   name: 'IndexRepair',
   created() {
@@ -88,10 +73,29 @@ export default {
       }]
     }
   },
-  computed: {},
+  computed: {
+    repairDot(){
+      return this.$store.state.repairDot;
+    },
+  },
   watch: {
     selectKey() {
       this.getRepairs();
+    },
+    repairDot(val){
+      if(val){
+        
+        this.$dialog.confirm({
+          mes: "你有新的维修订单",
+          opts: [{
+            txt: '确定',
+            color: true,
+            callback: () => {
+              this.getRepairs();
+            }
+          }]
+        });
+      }
     }
   },
   methods: {

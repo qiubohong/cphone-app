@@ -12,7 +12,7 @@ import IndexUser from '@/components/IndexUser'
 import RefreshOrder from '@/components/RefreshOrder'
 import RepairOrder from '@/components/RepairOrder'
 import Shop from '@/components/Shop'
-import Map from '@/components/Map'
+import Prize from '@/components/Prize'
 
 
 Vue.use(Router)
@@ -57,8 +57,8 @@ export default new Router({
     name: 'shop',
     component: Shop,
   },{
-    path: '/map',
-    name: 'map',
-    component: Map,
+    path: '/prize',
+    name: 'prize',
+    component: Prize,
   }]
 })

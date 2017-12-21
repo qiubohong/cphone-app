@@ -1,4 +1,5 @@
 // 引入 axios
+const DOMAIN = "http://www.chuangshouji.com/";
 const BASE = 'http://www.chuangshouji.com/cphone/';
 
 function fetch(opt) {
@@ -55,6 +56,9 @@ export function getCustomer(customerId){
 export function getStoreByProducerId(producerId){
     return fetch({ url: BASE + `storeinfo/getByProducerId/${producerId}`})
 }
+export function addStoreByProducerId(data){
+    return fetch({ url: BASE + `storeinfo/addStore`, data});
+}
 export function updateByProducerId(data){
     return fetch({ url: BASE + `/storeinfo/updateByProducerId`, data, method:"post"});
 }
@@ -62,6 +66,12 @@ export function updateByProducerId(data){
 export function getStoreInfo(storeId){
     return fetch({ url: BASE + `storeinfo/storeInfo/${storeId}`})
 }
+
+export function dispatchRaffle(data){
+    return fetch({ url: DOMAIN + `CPhoneRaffle/raffle/dispatchRaffle`, data})
+}
+
+
 
 //回收
 export function getWaitingOrder(number){

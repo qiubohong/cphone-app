@@ -18,6 +18,10 @@
             <yd-icon slot="icon" name="location"></yd-icon>
             <span slot="left">店铺信息</span>
         </yd-cell-item>
+        <yd-cell-item arrow type="link" href="/prize">
+            <yd-icon slot="icon" name="star-outline"></yd-icon>
+            <span slot="left">抽奖兑换码</span>
+        </yd-cell-item>
     </yd-cell-group>
     <div style="margin:.2rem">
       <yd-button size="large" type="danger" @click.native="logout">

@@ -29,6 +29,9 @@ Vue.mixin({
         setTimeout(function() {
           flag = false;
         }, 1000);
+        if(this.$store.state.producer.id){
+          this.$store.dispatch('FETCH_UPLOAD', { serviceStatus: 1 });
+        }
     });
 
   },
@@ -67,6 +70,13 @@ if (window.cordova) {
 
   function exitApp() {
     navigator.app.exitApp();
+    return;
+    navigator.Backbutton.goHome(function() {
+      console.log('go home success');
+    }, function(e) {
+      console.log(e);
+      navigator.app.exitApp();
+    });
   }
   document.addEventListener('deviceready', function() {
     var vm = new Vue({

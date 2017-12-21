@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import * as fetch from './fetch'
+import {notisfy, getUUID} from '../utils/index'
 
 Vue.use(Vuex)
 
@@ -52,7 +53,6 @@ export default new Vuex.Store({
       } catch (e) {}
       commit('SET_LOGIN', { data });
       if (data.data) {
-        //3分钟上报位置
         dispatch('FETCH_UPLOAD', { serviceStatus: 1 });
       }
     },
@@ -62,8 +62,9 @@ export default new Vuex.Store({
         state.timeId = -1;
       } else if (state.timeId == -1 && serviceStatus == 1) {
         state.timeId = window.setInterval(() => {
+          //1分钟上报位置
           dispatch('FETCH_UPLOAD', { serviceStatus: 1 })
-        }, 1000 * 60 * 5);
+        }, 1000 * 60);
       }
       return new Promise((resolve, reject) => {
         fetch.upload(state.producer.number, state.position.latitude, state.position.longitude, serviceStatus)
@@ -71,14 +72,27 @@ export default new Vuex.Store({
             resolve(data);
             if(data && data.errorCode == SUCCESS ){
               let array = data.data;
-              if(array && array.length > 1){
+              if(array && array.length > 0){
+                let notisfys = [];
                 array.forEach((item)=>{
                   if(item.orderType == '2'){
                     commit('SET_RECYCLE_DOT',{flag:true})
+                    notisfys.push({
+                      id: getUUID()(),
+                      title:"创手机-提醒您",
+                      text:"您有一条新的回收订单，快来查看吧！"
+                    })
                   }else if(item.orderType == '1'){
                     commit('SET_REPAIR_DOT',{flag:true})
+                    notisfys.push({
+                      id: getUUID()(),
+                      title:"创手机-提醒您",
+                      text:"您有一条新的维修订单，快来查看吧！"
+                    });
                   }
                 })
+
+                notisfy(notisfys);
               }
             }
           }).catch(reject);
@@ -103,6 +117,14 @@ export default new Vuex.Store({
     FETCH_STORE_UPDATE:({ commit, dispatch, state },{data}) => {
       return new Promise((resolve, reject) => {
         fetch.updateByProducerId(data)
+          .then((data) => {
+            resolve(data);
+          }).catch(reject);
+      })
+    },
+    FETCH_STORE_ADD:({ commit, dispatch, state },{data}) => {
+      return new Promise((resolve, reject) => {
+        fetch.addStoreByProducerId(data)
           .then((data) => {
             resolve(data);
           }).catch(reject);
