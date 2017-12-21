@@ -136,7 +136,6 @@ export default {
           this.recycles.push(item);
         }
       })
-      console.log(this.recycles);
     }
   }
 }

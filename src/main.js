@@ -16,11 +16,11 @@ Vue.config.productionTip = false
 let flag = false;
 
 Vue.mixin({
-  beforeCreate(){
+  mounted(){
     if(flag) return;
     flag = true;
+    var options = { maximumAge: 3000, timeout: 5000,enableHighAccuracy: true };
     navigator.geolocation.getCurrentPosition((position) =>{
-        console.log("position:"+position.coords.longitude)
         let longitude = position.coords.longitude;
         let latitude = position.coords.latitude;
         sessionStorage.setItem(this.$store.state.key.position.longitude, longitude);
@@ -32,7 +32,12 @@ Vue.mixin({
         if(this.$store.state.producer.id){
           this.$store.dispatch('FETCH_UPLOAD', { serviceStatus: 1 });
         }
-    });
+    },(e)=>{
+      console.log(e)
+      this.$dialog.alert({
+        mes:"定位失败，请开启GPS定位！"
+      });
+    },options);
 
   },
   methods: {

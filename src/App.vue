@@ -12,8 +12,29 @@ export default {
     if(!this.$store.state.producer.id){
       this.$router.replace({name:'login'});
     }
-
   },
+  created(){
+    this.$dialog.loading.open("获取地理信息");
+    var options = { enableHighAccuracy: true };
+    navigator.geolocation.getCurrentPosition((position) =>{
+        this.$dialog.loading.close();
+        let longitude = position.coords.longitude;
+        let latitude = position.coords.latitude;
+        console.log("longitude:"+longitude+',latitude:'+latitude)
+        sessionStorage.setItem(this.$store.state.key.position.longitude, longitude);
+        sessionStorage.setItem(this.$store.state.key.position.latitude, latitude);
+        this.$store.dispatch('FETCH_POSITION');
+        if(this.$store.state.producer.id){
+          this.$store.dispatch('FETCH_UPLOAD', { serviceStatus: 1 });
+        }
+    },(e)=>{
+      this.$dialog.loading.close();
+      console.log(e)
+      this.$dialog.alert({
+        mes:"定位失败，请开启GPS定位！"
+      });
+    },options);
+  }
 }
 </script>
 
