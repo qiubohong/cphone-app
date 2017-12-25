@@ -19,7 +19,7 @@ Vue.mixin({
   mounted(){
     if(flag) return;
     flag = true;
-    var options = { maximumAge: 3000, timeout: 5000,enableHighAccuracy: true };
+    var options = { maximumAge: 3000, timeout: 10000,enableHighAccuracy: true };
     navigator.geolocation.getCurrentPosition((position) =>{
         let longitude = position.coords.longitude;
         let latitude = position.coords.latitude;
