@@ -23,8 +23,8 @@ Vue.mixin({
     navigator.geolocation.getCurrentPosition((position) =>{
         let longitude = position.coords.longitude;
         let latitude = position.coords.latitude;
-        sessionStorage.setItem(this.$store.state.key.position.longitude, longitude);
-        sessionStorage.setItem(this.$store.state.key.position.latitude, latitude);
+        localStorage.setItem(this.$store.state.key.position.longitude, longitude);
+        localStorage.setItem(this.$store.state.key.position.latitude, latitude);
         this.$store.dispatch('FETCH_POSITION');
         setTimeout(function() {
           flag = false;
