@@ -66,10 +66,14 @@ export function updateByProducerId(data){
 export function getStoreInfo(storeId){
     return fetch({ url: BASE + `storeinfo/storeInfo/${storeId}`})
 }
+export function uploadFrequency(){
+    return fetch({ url: BASE + `user/uploadFrequency`})
+}
 
 export function dispatchRaffle(data){
     return fetch({ url: DOMAIN + `CPhoneRaffle/raffle/dispatchRaffle`, data})
 }
+
 
 
 

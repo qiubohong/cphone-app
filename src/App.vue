@@ -14,21 +14,24 @@ export default {
     }
   },
   created(){
-    this.$dialog.loading.open("获取地理信息");
     var options = { enableHighAccuracy: true };
+    this.$store.dispatch('FETCH_POSITION');
+    
+    var options = { maximumAge: 3000, timeout: 10000,enableHighAccuracy: true };
+    this.$dialog.loading.open("获取地理信息");
     navigator.geolocation.getCurrentPosition((position) =>{
-        this.$dialog.loading.close();
+        this.$dialog.loading.close("获取地理信息");
         let longitude = position.coords.longitude;
         let latitude = position.coords.latitude;
-        console.log("longitude:"+longitude+',latitude:'+latitude)
-        sessionStorage.setItem(this.$store.state.key.position.longitude, longitude);
-        sessionStorage.setItem(this.$store.state.key.position.latitude, latitude);
+        console.log("经纬度："+longitude+","+latitude)
+        localStorage.setItem(this.$store.state.key.position.longitude, longitude);
+        localStorage.setItem(this.$store.state.key.position.latitude, latitude);
         this.$store.dispatch('FETCH_POSITION');
+        
         if(this.$store.state.producer.id){
           this.$store.dispatch('FETCH_UPLOAD', { serviceStatus: 1 });
         }
     },(e)=>{
-      this.$dialog.loading.close();
       console.log(e)
       this.$dialog.alert({
         mes:"定位失败，请开启GPS定位！"
@@ -46,7 +49,7 @@ export default {
 	margin:0 .2rem;
 }
 .order-title{
-	font-size: .38rem;
+	font-size: .3rem;
 	margin: .2rem 0;
 }
 .order-status{

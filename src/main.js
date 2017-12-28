@@ -19,25 +19,6 @@ Vue.mixin({
   mounted(){
     if(flag) return;
     flag = true;
-    var options = { maximumAge: 3000, timeout: 10000,enableHighAccuracy: true };
-    navigator.geolocation.getCurrentPosition((position) =>{
-        let longitude = position.coords.longitude;
-        let latitude = position.coords.latitude;
-        localStorage.setItem(this.$store.state.key.position.longitude, longitude);
-        localStorage.setItem(this.$store.state.key.position.latitude, latitude);
-        this.$store.dispatch('FETCH_POSITION');
-        setTimeout(function() {
-          flag = false;
-        }, 1000);
-        if(this.$store.state.producer.id){
-          this.$store.dispatch('FETCH_UPLOAD', { serviceStatus: 1 });
-        }
-    },(e)=>{
-      console.log(e)
-      this.$dialog.alert({
-        mes:"定位失败，请开启GPS定位！"
-      });
-    },options);
 
   },
   methods: {

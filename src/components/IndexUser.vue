@@ -37,7 +37,7 @@ export default {
   data () {
     return {
       title:"用户中心",
-      ydswitch: true
+      ydswitch: sessionStorage.getItem("switch") != 'false'
     }
   },
   computed:{
@@ -55,6 +55,7 @@ export default {
       this.$dialog.loading.open();
       this.$store.dispatch('FETCH_UPLOAD', { serviceStatus: ~~this.ydswitch }).then(()=>{
         this.$dialog.loading.close();
+        sessionStorage.setItem("switch",this.ydswitch);
       });
     },
     logout(){

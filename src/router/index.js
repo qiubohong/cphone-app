@@ -11,6 +11,10 @@ import IndexUser from '@/components/IndexUser'
 
 import RefreshOrder from '@/components/RefreshOrder'
 import RepairOrder from '@/components/RepairOrder'
+import RefreshOrderTrans from '@/components/RefreshOrderTrans'
+import RepairOrderTrans from '@/components/RepairOrderTrans'
+
+
 import Shop from '@/components/Shop'
 import Prize from '@/components/Prize'
 
@@ -49,9 +53,17 @@ export default new Router({
     name: 'refreshOrder',
     component: RefreshOrder,
   },{
+    path: '/recycleOrderTrans/:id',
+    name: 'recycleOrderTrans',
+    component: RefreshOrderTrans,
+  },{
     path: '/repairOrder/:id',
     name: 'repairOrder',
     component: RepairOrder,
+  },{
+    path: '/repairOrderTrans/:id',
+    name: 'repairOrderTrans',
+    component: RepairOrderTrans,
   },{
     path: '/shop',
     name: 'shop',

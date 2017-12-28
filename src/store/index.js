@@ -25,6 +25,7 @@ export default new Vuex.Store({
     repairDot: true,
 
     timeId: -1,
+    uploadTime : -1, //默认-1， 需要请求服务器
     key: {
       login: "LOGIN",
       position: {
@@ -52,19 +53,26 @@ export default new Vuex.Store({
         data = JSON.parse(sessionStorage.getItem(state.key['login'])) || {};
       } catch (e) {}
       commit('SET_LOGIN', { data });
-      if (data.data) {
-        dispatch('FETCH_UPLOAD', { serviceStatus: 1 });
-      }
     },
     FETCH_UPLOAD: ({ commit, dispatch, state }, { serviceStatus }) => {
       if (serviceStatus != 1 && state.timeId != -1) {
         window.clearInterval(state.timeId);
         state.timeId = -1;
       } else if (state.timeId == -1 && serviceStatus == 1) {
-        state.timeId = window.setInterval(() => {
-          //1分钟上报位置
-          dispatch('FETCH_UPLOAD', { serviceStatus: 1 })
-        }, 1000 * 60);
+        if(state.uploadTime == -1){
+          dispatch('FETCH_UPLOAD_TIME').then(()=>{
+            state.timeId = window.setInterval(() => {
+              dispatch('FETCH_UPLOAD', { serviceStatus: 1 })
+            }, state.uploadTime);
+            console.log("上报平率："+state.uploadTime/1000/60+"分钟")
+          })
+        }else{
+          state.timeId = window.setInterval(() => {
+            dispatch('FETCH_UPLOAD', { serviceStatus: 1 })
+          }, state.uploadTime);
+          console.log("上报平率："+state.uploadTime/1000/60+"分钟")
+        }
+        
       }
       return new Promise((resolve, reject) => {
         fetch.upload(state.producer.number, state.position.latitude, state.position.longitude, serviceStatus)
@@ -96,6 +104,14 @@ export default new Vuex.Store({
               }
             }
           }).catch(reject);
+      })
+    },
+    FETCH_UPLOAD_TIME: ({ commit, dispatch, state }) => {
+      return new Promise((resolve)=>{
+        fetch.uploadFrequency().then((data)=>{
+          resolve();
+          commit("SET_UPLOAD_TIME",{data});
+        })
       })
     },
     FETCH_COSTOMER: ({ commit, dispatch, state }, {customerId}) => {
@@ -228,6 +244,13 @@ export default new Vuex.Store({
     },
     SET_USER_DOT: (state, { flag }) => {
       state.userDot = flag;
+    },
+    SET_UPLOAD_TIME: (state, { data }) => {
+      if (data.errorCode == SUCCESS) {
+        state.uploadTime = data.data * 1000 * 60;
+      } else {
+        state.uploadTime = 3 * 1000 * 60;
+      }
     },
   }
 });
