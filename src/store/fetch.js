@@ -73,7 +73,9 @@ export function uploadFrequency(){
 export function dispatchRaffle(data){
     return fetch({ url: DOMAIN + `CPhoneRaffle/raffle/dispatchRaffle`, data})
 }
-
+export function producerInfoByNumber(number){
+    return fetch({ url: BASE + `user/producerInfoByNumber/${number}`})
+}
 
 
 
@@ -98,6 +100,11 @@ export function finishOrder(serialNumber){
   return fetch({ url: BASE + `recycle/order/finishOrder/${serialNumber}`})
 }
 
+export function turnOrder(data){
+  return fetch({ url: BASE + `recycle/order/turnOrder`, data})
+}
+
+
 //维修
 export function getRepairOrder(number){
   return fetch({ url: BASE + `maintain/order/orderListByProducer`,data:{number}})
@@ -115,4 +122,8 @@ export function updateRepairOrder(data){
 
 export function finishRepairOrder(serialNumber){
   return fetch({ url: BASE + `maintain/order/finishOrder/${serialNumber}`})
+}
+
+export function turnRepairOrder(data){
+  return fetch({ url: BASE + `maintain/order/turnOrder`, data})
 }

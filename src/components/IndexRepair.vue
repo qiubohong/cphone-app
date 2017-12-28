@@ -20,9 +20,10 @@
             <yd-icon slot="icon" name="error" color="#f00" v-if="item.status == 5"></yd-icon>
             <div slot="left">
               <div class="order-box">
-                <div class="order-title">预约时间：{{item.period}}</div>
-                <div class="order-status" v-if="item.status == 1">待接单</div>
-                <div class="order-status" v-if="item.status == 2">已接单</div>
+                <div class="order-title" v-if="item.serviceType == 1">预约时间：{{item.period}}</div>
+                <div style="">类型：{{serviceType[item.serviceType]}}</div>
+                <div class="order-status" v-if="item.status == 1">未确认</div>
+                <div class="order-status" v-if="item.status == 2">已确认</div>
                 <div class="order-status money" v-if="item.status == 3">服务完成</div>
                 <div class="order-status ok" v-if="item.status == 4">已完成</div>
                 <div class="order-status error" v-if="item.status == 5">取消</div>
@@ -51,12 +52,12 @@ export default {
         size: 0
       }, {
         status: "1",
-        name: "待接单",
+        name: "未确认",
         size: 0,
         active:true,
       }, {
         status: "2",
-        name: "已接单",
+        name: "已确认",
         size: 0
       }, {
         status: "3",
@@ -70,7 +71,12 @@ export default {
         status: "5",
         name: "取消",
         size: 0
-      }]
+      }],
+      serviceType: {
+        "1": "上门",
+        "2": "门店",
+        "3": "邮寄"
+      },
     }
   },
   computed: {

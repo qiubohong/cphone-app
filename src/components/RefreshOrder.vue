@@ -2,7 +2,7 @@
   <yd-layout>
     <yd-navbar slot="navbar" title="订单详情">
       <yd-navbar-back-icon slot="left" @click.native="goBack"></yd-navbar-back-icon>
-      <router-link :to="'/recycleOrderTrans/'+this.$route.params.id" slot="right">
+      <router-link v-if="phoneOrder.status < 4" :to="'/recycleOrderTrans/'+this.$route.params.id" slot="right">
         <yd-icon name="share2"></yd-icon>
       </router-link>
     </yd-navbar>

@@ -18,7 +18,7 @@ export default {
     this.$store.dispatch('FETCH_POSITION');
     
     var options = { maximumAge: 3000, timeout: 10000,enableHighAccuracy: true };
-    this.$dialog.loading.open("获取地理信息");
+    //this.$dialog.loading.open("获取地理信息");
     navigator.geolocation.getCurrentPosition((position) =>{
         this.$dialog.loading.close("获取地理信息");
         let longitude = position.coords.longitude;
