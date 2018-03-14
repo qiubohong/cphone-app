@@ -2,7 +2,7 @@
   <yd-layout>
     <yd-navbar slot="navbar" title="订单详情">
       <yd-navbar-back-icon slot="left" @click.native="goBack"></yd-navbar-back-icon>
-      <router-link v-if="phoneOrder.status < 4" :to="'/recycleOrderTrans/'+this.$route.params.id" slot="right">
+      <router-link v-if="phoneOrder.status < 3" :to="'/recycleOrderTrans/'+this.$route.params.id" slot="right">
         <yd-icon name="share2"></yd-icon>
       </router-link>
     </yd-navbar>
@@ -43,11 +43,11 @@
         <yd-accordion-item title="回收问题" open>
           <yd-cell-group>
             <yd-cell-item v-for="(item,index) in problems">
-              <span slot="left">{{(index+1)+'. '+item.problemName}}
+              <div style="white-space:normal" slot="left">{{(index+1)+'. '+item.problemName}}
               <template v-if="item2.problemId == item.id" v-for="item2 in phoneOrder.problemSelects">
-                <yd-badge type="hollow">{{item2.problemItem}}</yd-badge>
+                <yd-badge style="margin:4px" type="hollow">{{item2.problemItem}}</yd-badge>
               </template>
-            </span>
+            </div>
             </yd-cell-item>
           </yd-cell-group>
         </yd-accordion-item>
@@ -105,9 +105,6 @@
     <yd-button size="large" type="primary" slot="bottom" @click.native="wait" v-if="phoneOrder.status == 3">
       <span>等待用户确认</span>
     </yd-button>
-    <div class="order-cancle" v-if="phoneOrder.status == 5">
-      <div class="order-cancle-txt">订单已取消</div>
-    </div>
   </yd-layout>
 </template>
 <script>
@@ -180,16 +177,12 @@ export default {
               temp.problemSelects.push(item2);
             }
           } else {
-            if (item.checked.indexOf(item2.id) >= 0) {
+            if (item.checked && item.checked.indexOf(item2.id) >= 0) {
               temp.problemSelects.push(item2);
             }
           }
         })
       });
-      if (temp.problemSelects.length < this.problems.length) {
-        this.toastError('有问题没选择！')
-        return;
-      }
 
       delete temp.problems;
       delete temp.status;
@@ -223,7 +216,6 @@ export default {
             dispatch('FETCH_COSTOMER', { customerId: data.data.customerId })
               .then((res) => {
                 this.customer = { ...res.data };
-                console.log(this.customer)
               });
             //手机信息
             recyclePhoneInfo(data.data.recyclePhoneId).then((res) => {
@@ -241,11 +233,17 @@ export default {
             let problems = [];
             data.data.problems.forEach((item, index) => {
               item.selects.forEach((item2) => {
+                if (item.problemType == 0) {
+                  item.checked = "";
+                }else{
+                  item.checked = [];
+                }
                 data.data.problemSelects.forEach((item3) => {
                   if (item3.problemId == item2.problemId) {
                     if (item.problemType == 0) {
                       item.checked = item3.id;
                     } else {
+                      console.log(item.checked)
                       if (!item.checked) {
                         item.checked = [item3.id];
                       } else {
@@ -257,7 +255,6 @@ export default {
               })
               problems.push({ ...item });
             })
-            console.log(problems)
             this.problems = [...problems];
           } else {
             this.toastError(data.errorInfo);

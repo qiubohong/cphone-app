@@ -7,11 +7,11 @@
       <yd-cell-group>
         <yd-cell-item>
           <span slot="left">用户电话：</span>
-          <yd-input v-model="customerPhone" type="tel" max="20" slot="right" required ></yd-input>
+          <input v-model="customerPhone" type="tel" max="11" slot="right" required >
         </yd-cell-item>
         <yd-cell-item>
-          <span slot="left">发放个数：</span>
-          <yd-input v-model="raffleNum" type="number" max="20" slot="right" required ></yd-input>
+          <span slot="left">兑换码数：</span>
+          <yd-input v-model="raffleNum" type="number" max="3" slot="right" required ></yd-input>
         </yd-cell-item>
       </yd-cell-group>
       <div style="margin:.2rem">
@@ -49,6 +49,10 @@ export default {
   			this.toastError('手机号不能为空')
   			return;
   		}
+      if(!/1[3|5|7|8][0-9]{9}/.test(this.customerPhone)){
+        this.toastError('手机号格式错误')
+        return;
+      }
   		if(this.raffleNum == ""){
   			this.toastError('兑换码不能为空')
   			return;
